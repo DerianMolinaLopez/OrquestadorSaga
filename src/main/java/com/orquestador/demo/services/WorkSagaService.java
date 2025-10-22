@@ -12,8 +12,10 @@ import com.orquestador.demo.saga.SagaStep;
 public class WorkSagaService {
     private static final Logger logger = LoggerFactory.getLogger(WorkSagaService.class);
     public void work(){
+        logger.info("Iniciando con la creacion de los pasos de operacion");
         SagaStep[] steps = getAllSteps();
         executeSteps(steps);
+        logger.info("Ejecucion de los pasos terminada, esperando la confirmacion para el numero de operacion: [COLOCAR NUMERO DE OPERACION]");
 
     }
     private SagaStep[] getAllSteps(){
