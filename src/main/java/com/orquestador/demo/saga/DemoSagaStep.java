@@ -6,20 +6,18 @@ import org.slf4j.LoggerFactory;
 import com.orquestador.demo.exceptions.SagaStepCompensateException;
 import com.orquestador.demo.exceptions.SagaStepExcecutionException;
 
-public class DemoSagaStep extends SagaStep {
+public class DemoSagaStep implements SagaStep {
      private static final Logger logger = LoggerFactory.getLogger(DemoSagaStep.class);
-    public DemoSagaStep(String operationId) {
-        super(operationId);
-    }
+ 
 
     @Override
     public void compensate() throws SagaStepCompensateException {
-        logger.info("Compensating DemoSagaStep with operationId: " + this.getOperationId());
+        logger.info("Compensating DemoSagaStep");
     }
 
     @Override
     public void execute() throws SagaStepExcecutionException {
-        logger.info("Executing DemoSagaStep with operationId: " + this.getOperationId());
+        logger.info("Executing DemoSagaStep");
     }
 
     

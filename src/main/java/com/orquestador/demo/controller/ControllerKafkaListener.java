@@ -4,31 +4,31 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.stereotype.Controller;
-
-import static com.orquestador.demo.utils.Constants.PrefixStringConstants.*;
-import static com.orquestador.demo.utils.Constants.TopicStringConstants.*;
-import static com.orquestador.demo.utils.Constants.GroupIdStringConstants.*;
-
-
-import com.orquestador.demo.interfaces.HandleComponentsErrorsService;
-import com.orquestador.demo.utils.messages_status.BaseMessage;
-
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.stereotype.Controller;
 
+import com.orquestador.demo.interfaces.HandleComponentsErrorsService;
+import com.orquestador.demo.services.WorkSagaService;
+import static com.orquestador.demo.utils.Constants.GroupIdStringConstants.GROUP_ID_CONFIRMACIONES;
+import static com.orquestador.demo.utils.Constants.GroupIdStringConstants.GROUP_ID_ERRORES;
+import static com.orquestador.demo.utils.Constants.GroupIdStringConstants.GROUP_ID_ORDENES;
+import static com.orquestador.demo.utils.Constants.PrefixStringConstants.PREFIX_COMPLETADO;
+import static com.orquestador.demo.utils.Constants.PrefixStringConstants.PREFIX_FALLO;
+import static com.orquestador.demo.utils.Constants.TopicStringConstants.TOPIC_CONFIRMACIONES;
+import static com.orquestador.demo.utils.Constants.TopicStringConstants.TOPIC_ERRORES;
+import static com.orquestador.demo.utils.Constants.TopicStringConstants.TOPIC_ORQUESTADOR;
+import com.orquestador.demo.utils.messages_status.BaseMessage;
 import com.orquestador.demo.utils.messages_status.ConfirmationMessage;
 import com.orquestador.demo.utils.messages_status.HandleComponentErrors;
 
-    /************************************************* */
-    // Sintaxis de los headers de los mensajes
-    // "COMPLETADO_{componentName}_{step}_{numberOfOperation}" para confirmaciones
-    // "FALLO_{componentName}_{step}_{numberOfOperation}" En caso de errores se agrega el mensaje de detalle
-    /************************************************* */
+
 @Controller
 public class ControllerKafkaListener {
       @Autowired
       private HandleComponentsErrorsService handleComponentsErrorsService;
+      @Autowired
+      private WorkSagaService workSagaService;
       private final Logger logger = LoggerFactory.getLogger(ControllerKafkaListener.class);
 
 
@@ -36,7 +36,14 @@ public class ControllerKafkaListener {
        public void listen(String message) {
            logger.info("Mensaje recibido: " + message);
            //flujo del orquestador
+           this.workSagaService.work();
        }
+
+    /************************************************* */
+    // Sintaxis de los headers de los mensajes
+    // "COMPLETADO_{componentName}_{step}_{numberOfOperation}" para confirmaciones
+    // "FALLO_{componentName}_{step}_{numberOfOperation}" En caso de errores se agrega el mensaje de detalle
+    /************************************************* */
 
        @KafkaListener(topics = TOPIC_CONFIRMACIONES, groupId = GROUP_ID_CONFIRMACIONES)
        public void listenConfirm( @Header("Kafka_Header_Operation") String operation, @Payload String message) {
