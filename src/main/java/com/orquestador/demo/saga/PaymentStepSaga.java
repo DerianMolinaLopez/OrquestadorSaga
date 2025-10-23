@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.orquestador.demo.controller.ControllerKafkaPublisher;
 import com.orquestador.demo.exceptions.SagaStepCompensateException;
 import com.orquestador.demo.exceptions.SagaStepExcecutionException;
@@ -22,6 +24,11 @@ public class PaymentStepSaga implements SagaStep{
    @Override
     public void execute(AplicationSagaContext ctx) throws SagaStepExcecutionException{
         logger.info("Ejecutando PaymentStepSaga");
+        JsonNode payloadToInventory = ctx.getPayload().get("payment");
+        ObjectNode inventoryNode = (ObjectNode) payloadToInventory;
+        inventoryNode.put("correlationId", ctx.getCorrelationId());
+        logger.info("Payload enviado a inventario: {}", inventoryNode.toString());
+        this.kafkaPublisher.publish(inventoryNode.toString(), topic);
 
     }
     @Override

@@ -21,7 +21,6 @@ public class InventoryStepSaga implements SagaStep{
       private SagaStepLogRepository sagaStepLogRepository;
       @Autowired
       private ControllerKafkaPublisher kafkaPublisher;
-
       private final String stepName = "InventoryStepSaga";
       private final String topic = "inventarios";
 
