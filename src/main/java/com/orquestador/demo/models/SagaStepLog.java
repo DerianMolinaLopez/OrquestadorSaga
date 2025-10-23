@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -17,29 +19,19 @@ public class SagaStepLog {
 
     @Id
     @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @Column(name = "saga_id")
-    private String sagaId;
+    @Column(name = "correlation_id")
+    private String correlationId;
 
     @Column(name = "step")
     private String step;
 
     @Column(name = "status")
-    private String status; // StepStatus
+    private String status; 
 
-    @Column(columnDefinition = "json")
-    private String request;
-
-    @Column(columnDefinition = "json")
-    private String response;
-
-    @Column(columnDefinition = "json")
-    private String error;
-
-    @Column(name = "attempt")
-    private Integer attempt;
-
+ 
     @Column(name = "started_at")
     private LocalDateTime startedAt;
 
@@ -47,33 +39,32 @@ public class SagaStepLog {
     private LocalDateTime finishedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "saga_id", insertable = false, updatable = false)
+    @JoinColumn(name = "correlation_id", insertable = false, updatable = false)
     private SagaInstance sagaInstance;
 
     // Constructores
     public SagaStepLog() {}
 
-    public SagaStepLog(String id, String sagaId, String step, String status, Integer attempt) {
-        this.id = id;
-        this.sagaId = sagaId;
+    public SagaStepLog( String correlationId, String step, String status) {
+      
+        this.correlationId = correlationId;
         this.step = step;
         this.status = status;
-        this.attempt = attempt;
+    
         this.startedAt = LocalDateTime.now();
     }
 
     
-    // Métodos de utilidad
-    public void markAsCompleted(String response) {
+    // Métodos de utilidad para marcarlo a como avanza el tiempo
+    public void markAsCompleted() {
         this.status = "COMPLETED";
-        this.response = response;
+
         this.finishedAt = LocalDateTime.now();
     }
 
-    public void markAsFailed(String error, Integer nextAttempt) {
+    public void markAsFailed(String error) {
         this.status = "FAILED";
-        this.error = error;
-        this.attempt = nextAttempt;
+     
         this.finishedAt = LocalDateTime.now();
     }
 }

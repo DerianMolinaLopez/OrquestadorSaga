@@ -21,17 +21,14 @@ import lombok.Data;
 public class SagaInstance {
 
     @Id
-    @Column(name = "saga_id")
-    private String sagaId;
-
     @Column(name = "correlation_id")
     private String correlationId;
 
     @Column(name = "name")
-    private String name; // 'PlaceOrder'
+    private String name; 
 
     @Column(name = "status")
-    private String status; // SagaStatus
+    private String status; 
 
     @Column(name = "current_step")
     private String currentStep;
@@ -57,8 +54,8 @@ public class SagaInstance {
     // Constructores
     public SagaInstance() {}
 
-    public SagaInstance(String sagaId, String correlationId, String name, String status) {
-        this.sagaId = sagaId;
+    public SagaInstance( String correlationId, String name, String status) {
+
         this.correlationId = correlationId;
         this.name = name;
         this.status = status;

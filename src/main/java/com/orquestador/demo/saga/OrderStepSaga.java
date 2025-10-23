@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.orquestador.demo.exceptions.SagaStepCompensateException;
 import com.orquestador.demo.exceptions.SagaStepExcecutionException;
 
@@ -15,9 +16,9 @@ public class OrderStepSaga implements  SagaStep{
 
   
     @Override
-    public void execute() throws SagaStepExcecutionException{
+    public void execute(AplicationSagaContext ctx) throws SagaStepExcecutionException{
         logger.info("Ejecutando OrderStepSaga");
-
+        // Lógica del paso
     }
     @Override
     public void compensate() throws SagaStepCompensateException{

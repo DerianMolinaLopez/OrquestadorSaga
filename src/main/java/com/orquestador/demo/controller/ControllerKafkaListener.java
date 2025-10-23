@@ -8,6 +8,9 @@ import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.orquestador.demo.interfaces.HandleComponentsErrorsService;
 import com.orquestador.demo.services.WorkSagaService;
 import static com.orquestador.demo.utils.Constants.GroupIdStringConstants.GROUP_ID_CONFIRMACIONES;
@@ -30,13 +33,22 @@ public class ControllerKafkaListener {
       @Autowired
       private WorkSagaService workSagaService;
       private final Logger logger = LoggerFactory.getLogger(ControllerKafkaListener.class);
+      private ObjectMapper objectMapper = new ObjectMapper();
 
 
        @KafkaListener(topics = TOPIC_ORQUESTADOR, groupId = GROUP_ID_ORDENES)
        public void listen(String message) {
            logger.info("Mensaje recibido: " + message);
-           //flujo del orquestador
-           this.workSagaService.work();
+        
+
+           try{
+              JsonNode messageJson = objectMapper.readTree(message);
+              this.workSagaService.work(messageJson);
+           } catch (JsonProcessingException e) {
+               logger.error("Error processing message: " + e.getMessage());
+           }catch (Exception e){
+               logger.error("Unexpected error: " + e.getMessage());
+           }
        }
 
     /************************************************* */
