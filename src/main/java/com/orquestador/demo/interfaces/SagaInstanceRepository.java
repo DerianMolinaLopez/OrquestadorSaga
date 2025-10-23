@@ -7,5 +7,6 @@ import com.orquestador.demo.models.SagaInstance;
 
 @Repository
 public interface SagaInstanceRepository extends JpaRepository<SagaInstance, String> {
+    SagaInstance findByCorrelationId(String correlationId);
     
 }

@@ -25,6 +25,7 @@ public class SagaInstanceService {
         
     }
 
+
     private SagaInstance convertJsonNodeToSagaInstance(JsonNode sagaInstanceJson)  throws ConvertJsonNodeToSagaInstanceException {
      
        String correlationId = sagaInstanceJson.get("correlationId").asText();
@@ -33,5 +34,15 @@ public class SagaInstanceService {
        SagaInstance sagaInstance = new SagaInstance( correlationId, name, status);
        return sagaInstance;
 
+    }
+    public void updateSagaInstanceStatus(String correlationId, String status){ 
+        SagaInstance sagaInstance = sagaInstanceRepository.findByCorrelationId(correlationId);
+        sagaInstance.setStatus(status);
+        sagaInstanceRepository.save(sagaInstance);
+    }
+    public void updateCurrentStepSagaInstance(String correlationId, String currentStep){ 
+        SagaInstance sagaInstance = sagaInstanceRepository.findByCorrelationId(correlationId);
+        sagaInstance.setCurrentStep(currentStep);
+        sagaInstanceRepository.save(sagaInstance);
     }
 }

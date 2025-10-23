@@ -33,10 +33,13 @@ public class WorkSagaService {
     private void executeSteps(List<SagaStep> steps, JsonNode payload){
      for(SagaStep step : steps){
          try {
+
+            stepLogSagaService.saveStepLog(payload.get("correlationId").asText(),step.getStepName());
             step.execute(new AplicationSagaContext(payload.get("correlationId").asText(), payload));
+            sagaInstanceService.updateCurrentStepSagaInstance(payload.get("correlationId").asText(), step.getStepName());
          } catch (ExecuteStepsException e) {
             logger.info("Error executing step: " + e.getMessage());
-            step.compensate();
+            throw new ExecuteStepsException("Error al ejecutar el paso " + step.getStepName());
          }
      }   
     }
