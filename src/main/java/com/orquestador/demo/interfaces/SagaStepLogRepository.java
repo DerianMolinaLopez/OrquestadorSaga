@@ -8,6 +8,8 @@ import com.orquestador.demo.models.SagaStepLog;
 @Repository
 public interface SagaStepLogRepository extends JpaRepository<SagaStepLog, String> {
 
+    SagaStepLog findByCorrelationIdAndStepName( String idStep);
+
     
     
 }

@@ -40,6 +40,7 @@ public class SagaInstanceService {
         sagaInstance.setStatus(status);
         sagaInstanceRepository.save(sagaInstance);
     }
+
     public void updateCurrentStepSagaInstance(String correlationId, String currentStep){ 
         SagaInstance sagaInstance = sagaInstanceRepository.findByCorrelationId(correlationId);
         sagaInstance.setCurrentStep(currentStep);

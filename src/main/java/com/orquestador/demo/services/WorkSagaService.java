@@ -43,4 +43,15 @@ public class WorkSagaService {
          }
      }   
     }
+
+    public void executeCompensate(){
+           for(SagaStep step : steps){
+         try {
+                  step.compensate();
+         } catch (ExecuteStepsException e) {
+            logger.info("Error executing step: " + e.getMessage());
+            throw new ExecuteStepsException("Error al ejecutar el paso " + step.getStepName());
+         }
+     }   
+    }
 }

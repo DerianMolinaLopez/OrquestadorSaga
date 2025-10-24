@@ -12,12 +12,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.orquestador.demo.interfaces.HandleComponentsErrorsService;
+import com.orquestador.demo.services.SagaInstanceService;
+import com.orquestador.demo.services.StepLogSagaService;
 import com.orquestador.demo.services.WorkSagaService;
 import static com.orquestador.demo.utils.Constants.GroupIdStringConstants.GROUP_ID_CONFIRMACIONES;
 import static com.orquestador.demo.utils.Constants.GroupIdStringConstants.GROUP_ID_ERRORES;
 import static com.orquestador.demo.utils.Constants.GroupIdStringConstants.GROUP_ID_ORDENES;
 import static com.orquestador.demo.utils.Constants.PrefixStringConstants.PREFIX_COMPLETADO;
 import static com.orquestador.demo.utils.Constants.PrefixStringConstants.PREFIX_FALLO;
+import com.orquestador.demo.utils.Constants.StatusOperation;
 import static com.orquestador.demo.utils.Constants.TopicStringConstants.TOPIC_CONFIRMACIONES;
 import static com.orquestador.demo.utils.Constants.TopicStringConstants.TOPIC_ERRORES;
 import static com.orquestador.demo.utils.Constants.TopicStringConstants.TOPIC_ORQUESTADOR;
@@ -32,6 +35,11 @@ public class ControllerKafkaListener {
       private HandleComponentsErrorsService handleComponentsErrorsService;
       @Autowired
       private WorkSagaService workSagaService;
+      @Autowired
+      private SagaInstanceService sagaInstanceService;
+      @Autowired
+      private StepLogSagaService stepLogService;
+
       private final Logger logger = LoggerFactory.getLogger(ControllerKafkaListener.class);
       private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -53,16 +61,18 @@ public class ControllerKafkaListener {
 
     /************************************************* */
     // Sintaxis de los headers de los mensajes
-    // "COMPLETADO_{componentName}_{step}_{numberOfOperation}" para confirmaciones
-    // "FALLO_{componentName}_{step}_{numberOfOperation}" En caso de errores se agrega el mensaje de detalle
+    // "COMPLETADO_{componentName}_{step}_{numberOfOperation}_{id_step}" para confirmaciones
+    // "FALLO_{componentName}_{step}_{numberOfOperation}_{id_step}" En caso de errores se agrega el mensaje de detalle
     /************************************************* */
 
        @KafkaListener(topics = TOPIC_CONFIRMACIONES, groupId = GROUP_ID_CONFIRMACIONES)
        public void listenConfirm( @Header("Kafka_Header_Operation") String operation, @Payload String message) {
            logger.info("Mensaje de confirmación recibido: " + message);
            ConfirmationMessage confirmationMessage = (ConfirmationMessage) convertHeaderToOObjectMessage(operation,PREFIX_COMPLETADO);
-
-           //flujo del servicio de confirmacion
+            this.sagaInstanceService.updateSagaInstanceStatus(confirmationMessage.getNumberOfOperation(), StatusOperation.COMPLETED);
+           
+            this.stepLogService.updateStepLogStatus(confirmationMessage.getNumberOfOperation(),confirmationMessage.getStepSaga(),StatusOperation.COMPLETED);
+    
        }
 
        @KafkaListener(topics = TOPIC_ERRORES, groupId = GROUP_ID_ERRORES)
@@ -72,8 +82,11 @@ public class ControllerKafkaListener {
                                 ) {
            logger.info("Mensaje de error recibido: " + message);
            HandleComponentErrors errorMessageExtracted = (HandleComponentErrors) convertHeaderToOObjectMessage(operation,PREFIX_FALLO);
-              errorMessageExtracted.setErrorMessage(message);
-      
+           errorMessageExtracted.setErrorMessage(message);
+            this.sagaInstanceService.updateCurrentStepSagaInstance(errorMessageExtracted.getNumberOfOperation(), errorMessageExtracted.getComponentName());
+            this.sagaInstanceService.updateSagaInstanceStatus(errorMessageExtracted.getNumberOfOperation(), StatusOperation.FAILED);
+            this.stepLogService.updateStepLogStatus(errorMessageExtracted.getNumberOfOperation(),errorMessageExtracted.getStepSaga(),StatusOperation.FAILED);
+    
               
 
            //flujo del servicio de errores
@@ -85,11 +98,12 @@ public class ControllerKafkaListener {
            String componentName = mensajeSeparado[1];
            String step = mensajeSeparado[2];
            String numberOfOperation = mensajeSeparado[3];
+           String idStep = mensajeSeparado[4];
            if (status.equals(PREFIX_COMPLETADO)) {
-               return new ConfirmationMessage(componentName, step, numberOfOperation);
+               return new ConfirmationMessage(componentName, step, numberOfOperation, idStep);
            }else{
 
-           return new HandleComponentErrors(componentName, step, numberOfOperation, null); 
+           return new HandleComponentErrors(componentName, step, numberOfOperation, idStep, null); 
            }
 
 
