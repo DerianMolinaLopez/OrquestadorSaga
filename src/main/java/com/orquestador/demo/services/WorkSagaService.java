@@ -34,6 +34,8 @@ public class WorkSagaService {
     private void executeSteps(List<SagaStep> steps, JsonNode payload){
      for(SagaStep step : steps){
          try {
+            //TODO: refactorizar las cadenas magicas y manejar todo en una variable de "correlationId"
+            //TODO: tambien enviar el numero de paso que le corresponde, por que peude haber un mismo paso, pero se requiere el especifico que fue registrado en operacion
 
             stepLogSagaService.saveStepLog(payload.get("correlationId").asText(),step.getStepName());
             step.execute(new AplicationSagaContext(payload.get("correlationId").asText(), payload));
