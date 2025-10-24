@@ -33,7 +33,7 @@ public class ControllerKafkaListener {
       @Autowired
       private WorkSagaService workSagaService;
       private final Logger logger = LoggerFactory.getLogger(ControllerKafkaListener.class);
-      private ObjectMapper objectMapper = new ObjectMapper();
+      private final ObjectMapper objectMapper = new ObjectMapper();
 
 
        @KafkaListener(topics = TOPIC_ORQUESTADOR, groupId = GROUP_ID_ORDENES)
