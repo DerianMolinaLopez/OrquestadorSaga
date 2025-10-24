@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.orquestador.demo.exceptions.ExecuteStepsException;
 import com.orquestador.demo.saga.AplicationSagaContext;
 import com.orquestador.demo.saga.SagaStep;
+import com.orquestador.demo.utils.messages_status.HandleComponentErrors;
 
 @Service
 public class WorkSagaService {
@@ -44,10 +45,10 @@ public class WorkSagaService {
      }   
     }
 
-    public void executeCompensate(){
+    public void executeCompensate(HandleComponentErrors errorContext){
            for(SagaStep step : steps){
          try {
-                  step.compensate();
+              step.compensate(errorContext);
          } catch (ExecuteStepsException e) {
             logger.info("Error executing step: " + e.getMessage());
             throw new ExecuteStepsException("Error al ejecutar el paso " + step.getStepName());

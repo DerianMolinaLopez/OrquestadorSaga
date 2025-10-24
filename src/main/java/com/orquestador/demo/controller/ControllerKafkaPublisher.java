@@ -15,5 +15,6 @@ public class ControllerKafkaPublisher {
     public void publish(String message,String topic) {
         kafkaTemplate.send(topic, message);
     }
+   
     
 }
