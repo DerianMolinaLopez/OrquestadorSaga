@@ -5,9 +5,11 @@ import com.orquestador.demo.exceptions.SagaStepExcecutionException;
 
 public interface SagaStep {
 
-    public void execute() throws SagaStepExcecutionException;
+    public void execute(AplicationSagaContext ctx) throws SagaStepExcecutionException;
 
     public void compensate() throws SagaStepCompensateException;
+
+    public String getStepName();
 
 
 }

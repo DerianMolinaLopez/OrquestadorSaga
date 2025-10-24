@@ -1,0 +1,123 @@
+{
+  "correlationId": "7c3c8b6d-2b5c-4d7c-9b7e-9f7a6e77a0ab",
+  "idempotencyKey": "order-cust_1029-2025-09-02T10:21:33.001Z",
+  "clientID": "ASDIAKNMSAIQ",
+  "channel": "web",
+  "tenant": "mx",
+  "sagaVersion": "1.0",
+
+  "customer": {
+    "id": "cust_1029",
+    "email": "cliente@example.com",
+    "phone": "+52-55-5555-5555",
+    "name": "María López",
+    "loyalty": { "cardId": "LOY-9981", "accrue": true }
+  },
+
+  "cart": {
+    "currency": "MXN",
+    "coupon": { "code": "BACK2SCHOOL", "discountValue": 150.00, "type": "amount" },
+    "items": [
+      {
+        "lineId": "1",
+        "sku": "SKU-ABC",
+        "name": "Laptop 14\"",
+        "qty": 2,
+        "unitPrice": 799.50,
+        "taxRate": 0.16,
+        "warehouse": "CDMX-01",
+        "vendor": "main",
+        "attributes": { "color": "gris", "warrantyMonths": 12 },
+        "weightKg": 1.4,
+        "dimensionsCm": { "l": 32, "w": 22, "h": 2 },
+        "requiresSerial": false
+      },
+      {
+        "lineId": "2",
+        "sku": "SKU-XYZ",
+        "name": "Mochila",
+        "qty": 1,
+        "unitPrice": 299.00,
+        "taxRate": 0.16,
+        "warehouse": "CDMX-01",
+        "vendor": "marketplace-21",
+        "attributes": { "color": "negro" },
+        "weightKg": 0.7,
+        "dimensionsCm": { "l": 45, "w": 30, "h": 15 }
+      }
+    ],
+    "totals": {
+      "subtotal": 1898.00,
+      "discounts": 150.00,
+      "tax": 279.68,
+      "shipping": 99.00,
+      "grandTotal": 2126.68
+    }
+  },
+
+  "payment": {
+    "amount": 2126.68,
+    "currency": "MXN",
+    "method": "card",
+    "token": "tok_visa_4242",
+    "capture": true,
+    "installments": { "count": 3, "issuer": "visa" },
+    "billingAddressId": "bill_11",
+    "fraud": {
+      "deviceId": "dev-8af1",
+      "ip": "187.188.10.10",
+      "fingerprint": "c6d0f0f5…",
+      "riskScore": null
+    },
+    "split": [
+      { "payee": "main", "amount": 1900.00 },
+      { "payee": "marketplace-21", "amount": 226.68 }
+    ]
+  },
+
+  "shipping": {
+    "method": "home-delivery",
+    "carrier": "estafeta",
+    "serviceLevel": "standard",
+    "addressId": "addr_88",
+    "addressOverride": {
+      "street": "Av. Siempre Viva 123",
+      "extNo": "123",
+      "intNo": "4B",
+      "neighborhood": "Centro",
+      "city": "Culiacán",
+      "state": "SIN",
+      "postalCode": "80000",
+      "country": "MX",
+      "geo": { "lat": 24.806, "lng": -107.394 }
+    },
+    "slot": { "date": "2025-09-02", "window": "14:00-18:00" },
+    "contact": { "name": "María López", "phone": "+52-55-5555-5555" },
+    "notes": "Tocar timbre. Dejar con portería si no hay respuesta.",
+    "requiresSignature": true
+  },
+
+  "invoice": {
+    "required": true,
+    "rfc": "XAXX010101000",
+    "usoCFDI": "G03",
+    "emailCFDI": "facturacion@example.com",
+    "receptor": {
+      "nombre": "María López",
+      "regimenFiscalReceptor": "605",
+      "domicilioFiscalReceptor": "80000"
+    }
+  },
+
+  "notifications": {
+    "channels": ["email", "sms"],
+    "language": "es-MX"
+  },
+
+  "extensions": {
+    "gift": { "enabled": false },
+    "metadata": {
+      "utm": { "source": "campaign", "medium": "email", "campaign": "septiembre" }
+    }
+  }
+}
