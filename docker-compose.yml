@@ -86,6 +86,33 @@ services:
     networks:
       - microservicios-proceso-comrpas_app_network
 
+  mysql-inventarios:
+      image: mysql:8.0
+      container_name: mysql_inventarios
+      ports:
+        - "3308:3306"  # opcional: solo para acceso desde el host
+      environment:
+        MYSQL_ROOT_PASSWORD: root
+        MYSQL_DATABASE: inventory
+        MYSQL_USER: derian
+        MYSQL_PASSWORD: derian
+        TZ: UTC
+      volumes:
+        - C:/Users/deria/Desktop/docker-voumenes/inventarios:/var/lib/mysql
+      healthcheck:
+        test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-proot"]
+        interval: 5s
+        timeout: 3s
+        retries: 15
+      command: [
+        "--default-authentication-plugin=mysql_native_password",
+        "--character-set-server=utf8mb4",
+        "--collation-server=utf8mb4_0900_ai_ci"
+      ]
+      networks:
+        - microservicios-proceso-comrpas_app_network
+
+
   orquestador:
     image: orquestador:0.0.1
     mem_limit: 512m         
