@@ -1,6 +1,7 @@
 package com.orquestador.demo.services;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,12 +43,12 @@ public class StepLogSagaService {
         try {
                 LocalDateTime fechaHoraActual = LocalDateTime.now();
 
-                 SagaStepLog stepLog = sagaStepLogRepository.findByCorrelationIdAndStepName(stepId);
-            if (stepLog != null) {
-
-                stepLog.setFinishedAt(fechaHoraActual);
-                stepLog.setStatus(status);
-                sagaStepLogRepository.save(stepLog);
+                Optional <SagaStepLog> optionalStepLog = sagaStepLogRepository.findByCorrelationId(stepId);
+            if (optionalStepLog.isPresent()) {
+                SagaStepLog step = optionalStepLog.get();
+                step.setFinishedAt(fechaHoraActual);
+                step.setStatus(status);
+                sagaStepLogRepository.save(step);
             } else {
                 logger.error("No se encontró el registro del paso para actualizar. CorrelationId: {}, StepID: {}", correlationId, stepId);
             }

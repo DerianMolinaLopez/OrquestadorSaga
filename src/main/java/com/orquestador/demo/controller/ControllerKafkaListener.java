@@ -86,7 +86,7 @@ public class ControllerKafkaListener {
             this.sagaInstanceService.updateCurrentStepSagaInstance(errorMessageExtracted.getNumberOfOperation(), errorMessageExtracted.getComponentName());
             this.sagaInstanceService.updateSagaInstanceStatus(errorMessageExtracted.getNumberOfOperation(), StatusOperation.FAILED);
             this.stepLogService.updateStepLogStatus(errorMessageExtracted.getNumberOfOperation(),errorMessageExtracted.getStepSaga(),StatusOperation.FAILED);
-            this.workSagaService.executeCompensate(errorMessageExtracted);
+         //   this.workSagaService.executeCompensate(errorMessageExtracted);
               
 
            //flujo del servicio de errores
