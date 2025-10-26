@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Controller;
 
@@ -18,8 +17,6 @@ import com.orquestador.demo.services.WorkSagaService;
 import static com.orquestador.demo.utils.Constants.GroupIdStringConstants.GROUP_ID_CONFIRMACIONES;
 import static com.orquestador.demo.utils.Constants.GroupIdStringConstants.GROUP_ID_ERRORES;
 import static com.orquestador.demo.utils.Constants.GroupIdStringConstants.GROUP_ID_ORDENES;
-import static com.orquestador.demo.utils.Constants.PrefixStringConstants.PREFIX_COMPLETADO;
-import static com.orquestador.demo.utils.Constants.PrefixStringConstants.PREFIX_FALLO;
 import com.orquestador.demo.utils.Constants.StatusOperation;
 import static com.orquestador.demo.utils.Constants.TopicStringConstants.TOPIC_CONFIRMACIONES;
 import static com.orquestador.demo.utils.Constants.TopicStringConstants.TOPIC_ERRORES;
@@ -66,46 +63,41 @@ public class ControllerKafkaListener {
     /************************************************* */
 
        @KafkaListener(topics = TOPIC_CONFIRMACIONES, groupId = GROUP_ID_CONFIRMACIONES)
-       public void listenConfirm( @Header("Kafka_Header_Operation") String operation, @Payload String message) {
+       public void listenConfirm(  @Payload String message) {
            logger.info("Mensaje de confirmación recibido: " + message);
-           ConfirmationMessage confirmationMessage = (ConfirmationMessage) convertHeaderToOObjectMessage(operation,PREFIX_COMPLETADO);
+           ConfirmationMessage confirmationMessage = (ConfirmationMessage) convertHeaderToOObjectMessage(message);
             this.sagaInstanceService.updateSagaInstanceStatus(confirmationMessage.getNumberOfOperation(), StatusOperation.COMPLETED);
            
-            this.stepLogService.updateStepLogStatus(confirmationMessage.getNumberOfOperation(),confirmationMessage.getStepSaga(),StatusOperation.COMPLETED);
+            this.stepLogService.updateStepLogStatus(confirmationMessage.getNumberOfOperation(),confirmationMessage.getIdStep(),StatusOperation.COMPLETED);
     
        }
 
        @KafkaListener(topics = TOPIC_ERRORES, groupId = GROUP_ID_ERRORES)
-       public void listenErrors(@Header("Kafka_Header_Operation") String operation,
-                                @Payload String message,
-                                @Header("errorMessage") String errorMessage
+       public void listenErrors(
+                                @Payload String message
                                 ) {
            logger.info("Mensaje de error recibido: " + message);
-           HandleComponentErrors errorMessageExtracted = (HandleComponentErrors) convertHeaderToOObjectMessage(operation,PREFIX_FALLO);
+           HandleComponentErrors errorMessageExtracted = (HandleComponentErrors) convertHeaderToOObjectMessage(message);
            errorMessageExtracted.setErrorMessage(message);
             this.sagaInstanceService.updateCurrentStepSagaInstance(errorMessageExtracted.getNumberOfOperation(), errorMessageExtracted.getComponentName());
             this.sagaInstanceService.updateSagaInstanceStatus(errorMessageExtracted.getNumberOfOperation(), StatusOperation.FAILED);
-            this.stepLogService.updateStepLogStatus(errorMessageExtracted.getNumberOfOperation(),errorMessageExtracted.getStepSaga(),StatusOperation.FAILED);
+            this.stepLogService.updateStepLogStatus(errorMessageExtracted.getNumberOfOperation(),errorMessageExtracted.getIdStep(),StatusOperation.FAILED);
          //   this.workSagaService.executeCompensate(errorMessageExtracted);
               
 
            //flujo del servicio de errores
        }
 
-       private BaseMessage convertHeaderToOObjectMessage(String header,String status){
+       private BaseMessage convertHeaderToOObjectMessage(String message){
         
-           String[] mensajeSeparado = header.split("_");
+           String[] mensajeSeparado = message.split("_");
            String componentName = mensajeSeparado[1];
            String step = mensajeSeparado[2];
            String numberOfOperation = mensajeSeparado[3];
            String idStep = mensajeSeparado[4];
-           if (status.equals(PREFIX_COMPLETADO)) {
-               return new ConfirmationMessage(componentName, step, numberOfOperation, idStep);
-           }else{
 
-           return new HandleComponentErrors(componentName, step, numberOfOperation, idStep, null); 
-           }
-
+            return new ConfirmationMessage(componentName, step, numberOfOperation, idStep);
+          
 
        }
         

@@ -20,10 +20,11 @@ public class StepLogSagaService {
     @Autowired
     private SagaStepLogRepository sagaStepLogRepository;
 
-    public void saveStepLog(String correlationId,String stepName){
+    public String saveStepLog(String correlationId,String stepName){
         try {
                 SagaStepLog stepLog = createStepLogInstance(correlationId, stepName);
-                sagaStepLogRepository.save(stepLog);
+                SagaStepLog sagaSaved = sagaStepLogRepository.save(stepLog);
+                return sagaSaved.getId();
               
         } catch (ExtractJsonNodeValuesToSagaStepLogException e) {
             logger.error("Error al guardar el registro del paso", e);
@@ -41,9 +42,10 @@ public class StepLogSagaService {
 
     public void updateStepLogStatus(String correlationId, String stepId,String status) {
         try {
+            logger.info("Actualizando elestado del paso: {} para el numero de operacion: {}",stepId,correlationId);
                 LocalDateTime fechaHoraActual = LocalDateTime.now();
 
-                Optional <SagaStepLog> optionalStepLog = sagaStepLogRepository.findByCorrelationId(stepId);
+                Optional <SagaStepLog> optionalStepLog = sagaStepLogRepository.findById(stepId);
             if (optionalStepLog.isPresent()) {
                 SagaStepLog step = optionalStepLog.get();
                 step.setFinishedAt(fechaHoraActual);
