@@ -5,15 +5,23 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.orquestador.demo.controller.ControllerKafkaPublisher;
 import com.orquestador.demo.exceptions.SagaStepCompensateException;
 import com.orquestador.demo.exceptions.SagaStepExcecutionException;
 import com.orquestador.demo.utils.ModifyPayloadJson;
+import com.orquestador.demo.utils.messages_status.HandleComponentErrors;
 
+/**
+ * TODO: Refactorizar el codigo que se esta repitiendo y agregar mas logica al compensate
+ * TODO: se repite la instancia del mapper, convertErrorstoString y es exactamente igual la publicacion publish
+ */
 @Component
 @Order(1)
 public class InventoryStepSaga implements SagaStep{
       private static final Logger logger = LoggerFactory.getLogger(InventoryStepSaga.class);
+      private final ObjectMapper mapper = new ObjectMapper();
 
       @Autowired
       private ControllerKafkaPublisher kafkaPublisher;
@@ -31,10 +39,21 @@ public class InventoryStepSaga implements SagaStep{
 
     }
     @Override
-    public void compensate() throws SagaStepCompensateException{
+    public void compensate(HandleComponentErrors errorContext) throws SagaStepCompensateException{
         logger.info("Compensando InventoryStepSaga");
+        String message = this.convertErrorstoString(errorContext);
+        this.kafkaPublisher.publish(message, topic);
 
     }
+
+   private String convertErrorstoString(HandleComponentErrors errorContext) {
+    try {
+        return this.mapper.writeValueAsString(errorContext);
+    } catch (Exception e) {
+        throw new RuntimeException("Error al convertir el objeto a String JSON", e);
+    }
+}
+
     @Override
     public String getStepName() {
         return stepName;

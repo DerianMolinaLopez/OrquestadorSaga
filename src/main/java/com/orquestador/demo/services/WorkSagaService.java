@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.orquestador.demo.exceptions.ExecuteStepsException;
 import com.orquestador.demo.saga.AplicationSagaContext;
 import com.orquestador.demo.saga.SagaStep;
+import com.orquestador.demo.utils.messages_status.HandleComponentErrors;
 
 @Service
 public class WorkSagaService {
@@ -33,10 +34,23 @@ public class WorkSagaService {
     private void executeSteps(List<SagaStep> steps, JsonNode payload){
      for(SagaStep step : steps){
          try {
+            //TODO: refactorizar las cadenas magicas y manejar todo en una variable de "correlationId"
+            //TODO: tambien enviar el numero de paso que le corresponde, por que peude haber un mismo paso, pero se requiere el especifico que fue registrado en operacion
 
             stepLogSagaService.saveStepLog(payload.get("correlationId").asText(),step.getStepName());
             step.execute(new AplicationSagaContext(payload.get("correlationId").asText(), payload));
             sagaInstanceService.updateCurrentStepSagaInstance(payload.get("correlationId").asText(), step.getStepName());
+         } catch (ExecuteStepsException e) {
+            logger.info("Error executing step: " + e.getMessage());
+            throw new ExecuteStepsException("Error al ejecutar el paso " + step.getStepName());
+         }
+     }   
+    }
+
+    public void executeCompensate(HandleComponentErrors errorContext){
+           for(SagaStep step : steps){
+         try {
+              step.compensate(errorContext);
          } catch (ExecuteStepsException e) {
             logger.info("Error executing step: " + e.getMessage());
             throw new ExecuteStepsException("Error al ejecutar el paso " + step.getStepName());

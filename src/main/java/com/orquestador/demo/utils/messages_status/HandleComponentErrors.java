@@ -5,9 +5,10 @@ package com.orquestador.demo.utils.messages_status;
 public class HandleComponentErrors extends BaseMessage {
     private String errorMessage;
 
-    public HandleComponentErrors(String componentName, String stepSaga, String numberOfOperation, String errorMessage) {
-        super(componentName, stepSaga, numberOfOperation);
+    public HandleComponentErrors(String componentName, String stepSaga, String numberOfOperation, String idStep, String errorMessage) {
+        super(componentName, stepSaga, numberOfOperation, idStep);
         this.errorMessage = errorMessage;
+
     }
 
     public String getErrorMessage() {
