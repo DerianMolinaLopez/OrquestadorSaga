@@ -10,5 +10,6 @@ import lombok.Data;
 public class AplicationSagaContext {
     private String correlationId;
     private JsonNode payload;
+    private String stepId;
 
 }

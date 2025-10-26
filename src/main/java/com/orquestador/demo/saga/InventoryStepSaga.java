@@ -1,5 +1,8 @@
 package com.orquestador.demo.saga;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,8 +37,16 @@ public class InventoryStepSaga implements SagaStep{
     public void execute(AplicationSagaContext ctx) throws SagaStepExcecutionException{
         logger.info("Ejecutando InventoryStepSaga");
         String payloadModified = ModifyPayloadJson.addCorrelationIdToObjectNode(ctx.getPayload().get("cart"), ctx.getCorrelationId());
+                                            
          logger.info("Payload enviado a inventario: {}", payloadModified);
-         this.kafkaPublisher.publish(payloadModified, topic);
+
+         Map<String, Object> headers = new HashMap<>();
+          
+         headers.put("component", "inventarios");
+         headers.put("correlationId", ctx.getCorrelationId());
+         headers.put("stepId",ctx.getStepId() );
+         headers.put("objetivo","grabado");
+         this.kafkaPublisher.publishWithHeaders(payloadModified, topic, headers);
 
     }
     @Override

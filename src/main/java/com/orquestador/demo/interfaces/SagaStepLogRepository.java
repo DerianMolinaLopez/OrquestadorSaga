@@ -16,7 +16,7 @@ public interface SagaStepLogRepository extends JpaRepository<SagaStepLog, String
         FROM SagaStepLog s 
         WHERE s.correlationId = :id
     """)
-    Optional<SagaStepLog> findByCorrelationId(@Param("id") String id);
+    Optional<SagaStepLog> findByStepId(@Param("id") String id);
 
     
     
