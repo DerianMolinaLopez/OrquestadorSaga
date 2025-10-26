@@ -81,7 +81,7 @@ public class ControllerKafkaListener {
            errorMessageExtracted.setErrorMessage(message);
             this.sagaInstanceService.updateCurrentStepSagaInstance(errorMessageExtracted.getNumberOfOperation(), errorMessageExtracted.getComponentName());
             this.sagaInstanceService.updateSagaInstanceStatus(errorMessageExtracted.getNumberOfOperation(), StatusOperation.FAILED);
-            this.stepLogService.updateStepLogStatus(errorMessageExtracted.getNumberOfOperation(),errorMessageExtracted.getStepSaga(),StatusOperation.FAILED);
+            this.stepLogService.updateStepLogStatus(errorMessageExtracted.getNumberOfOperation(),errorMessageExtracted.getIdStep(),StatusOperation.FAILED);
          //   this.workSagaService.executeCompensate(errorMessageExtracted);
               
 
