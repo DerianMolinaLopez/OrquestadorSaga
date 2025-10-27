@@ -10,7 +10,6 @@ import org.springframework.stereotype.Controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.orquestador.demo.interfaces.HandleComponentsErrorsService;
 import com.orquestador.demo.services.SagaInstanceService;
 import com.orquestador.demo.services.StepLogSagaService;
 import com.orquestador.demo.services.WorkSagaService;
@@ -28,8 +27,7 @@ import com.orquestador.demo.utils.messages_status.HandleComponentErrors;
 
 @Controller
 public class ControllerKafkaListener {
-      @Autowired
-      private HandleComponentsErrorsService handleComponentsErrorsService;
+
       @Autowired
       private WorkSagaService workSagaService;
       @Autowired
@@ -65,7 +63,7 @@ public class ControllerKafkaListener {
        @KafkaListener(topics = TOPIC_CONFIRMACIONES, groupId = GROUP_ID_CONFIRMACIONES)
        public void listenConfirm(  @Payload String message) {
            logger.info("Mensaje de confirmación recibido: " + message);
-           ConfirmationMessage confirmationMessage = (ConfirmationMessage) convertHeaderToOObjectMessage(message);
+           ConfirmationMessage confirmationMessage = (ConfirmationMessage) convertHeaderToObjectMessage(message);
             this.sagaInstanceService.updateSagaInstanceStatus(confirmationMessage.getNumberOfOperation(), StatusOperation.COMPLETED);
            
             this.stepLogService.updateStepLogStatus(confirmationMessage.getNumberOfOperation(),confirmationMessage.getIdStep(),StatusOperation.COMPLETED);
@@ -77,28 +75,36 @@ public class ControllerKafkaListener {
                                 @Payload String message
                                 ) {
            logger.info("Mensaje de error recibido: " + message);
-           HandleComponentErrors errorMessageExtracted = (HandleComponentErrors) convertHeaderToOObjectMessage(message);
+           HandleComponentErrors errorMessageExtracted = (HandleComponentErrors) convertHeaderToObjectMessage(message);
            errorMessageExtracted.setErrorMessage(message);
             this.sagaInstanceService.updateCurrentStepSagaInstance(errorMessageExtracted.getNumberOfOperation(), errorMessageExtracted.getComponentName());
             this.sagaInstanceService.updateSagaInstanceStatus(errorMessageExtracted.getNumberOfOperation(), StatusOperation.FAILED);
             this.stepLogService.updateStepLogStatus(errorMessageExtracted.getNumberOfOperation(),errorMessageExtracted.getIdStep(),StatusOperation.FAILED);
-         //   this.workSagaService.executeCompensate(errorMessageExtracted);
+            this.workSagaService.executeCompensate(errorMessageExtracted);
               
 
            //flujo del servicio de errores
        }
 
-       private BaseMessage convertHeaderToOObjectMessage(String message){
+      private BaseMessage convertHeaderToObjectMessage(String message) {
+        String[] mensajeSeparado = message.split("_");
+        String componentName = mensajeSeparado[1];
+        String step = mensajeSeparado[2];
+        String numberOfOperation = mensajeSeparado[3];
+        String idStep = mensajeSeparado[4];
         
-           String[] mensajeSeparado = message.split("_");
-           String componentName = mensajeSeparado[1];
-           String step = mensajeSeparado[2];
-           String numberOfOperation = mensajeSeparado[3];
-           String idStep = mensajeSeparado[4];
-
+        // Determinar qué tipo de mensaje crear basado en alguna lógica
+        if (isErrorMessage(mensajeSeparado)) {
+            String errorDetails = mensajeSeparado.length > 5 ? mensajeSeparado[5] : "";
+            return new HandleComponentErrors(componentName, step, numberOfOperation, idStep, errorDetails);
+        } else {
             return new ConfirmationMessage(componentName, step, numberOfOperation, idStep);
-          
-
-       }
+        }
+    }
+     private boolean isErrorMessage(String[] messageParts) {
+            // Lógica para determinar si es error
+            // Ejemplo: basado en el primer campo, longitud, etc.
+            return messageParts[0].equals("ERROR") || messageParts.length > 5;
+        }
         
 }

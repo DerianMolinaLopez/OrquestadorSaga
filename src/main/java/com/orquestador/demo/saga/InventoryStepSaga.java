@@ -15,11 +15,6 @@ import com.orquestador.demo.exceptions.SagaStepCompensateException;
 import com.orquestador.demo.exceptions.SagaStepExcecutionException;
 import com.orquestador.demo.utils.ModifyPayloadJson;
 import com.orquestador.demo.utils.messages_status.HandleComponentErrors;
-
-/**
- * TODO: Refactorizar el codigo que se esta repitiendo y agregar mas logica al compensate
- * TODO: se repite la instancia del mapper, convertErrorstoString y es exactamente igual la publicacion publish
- */
 @Component
 @Order(1)
 public class InventoryStepSaga implements SagaStep{
@@ -52,8 +47,13 @@ public class InventoryStepSaga implements SagaStep{
     @Override
     public void compensate(HandleComponentErrors errorContext) throws SagaStepCompensateException{
         logger.info("Compensando InventoryStepSaga");
-        String message = this.convertErrorstoString(errorContext);
-        this.kafkaPublisher.publish(message, topic);
+  
+        Map<String,Object> headers = new HashMap<>();
+         headers.put("component", "inventarios");
+         headers.put("correlationId", errorContext.getNumberOfOperation());
+         headers.put("objetivo","compensacion");
+        this.kafkaPublisher.publishWithHeaders(errorContext.getErrorMessage(), topic, headers);
+  
 
     }
 

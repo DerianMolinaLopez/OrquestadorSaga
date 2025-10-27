@@ -40,7 +40,8 @@ public class PaymentStepSaga implements SagaStep{
     }
         private String convertErrorstoString(HandleComponentErrors errorContext) {
     try {
-        return this.mapper.writeValueAsString(errorContext);
+        return "";
+        //return this.mapper.writeValueAsString(errorContext);
     } catch (Exception e) {
         throw new RuntimeException("Error al convertir el objeto a String JSON", e);
     }

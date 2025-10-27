@@ -38,7 +38,7 @@ public class StepLogSagaService {
 
     }
 
-    //TODO: estoy enviando 3 variables, lo recomendable sera dejarlo asi o guardar todo en un objeto 
+
 
     public void updateStepLogStatus(String correlationId, String stepId,String status) {
         try {
