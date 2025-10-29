@@ -33,6 +33,8 @@ public class OrderStepSaga implements  SagaStep{
     @Override
     public void compensate(HandleComponentErrors errorContext) throws SagaStepCompensateException{
         logger.info("Compensando OrderStepSaga");
+
+  //      this.kafkaPublisher.publishWithHeaders(stepName, topic, headers);
       //  String message = this.convertErrorstoString(errorContext);
       //  this.kafkaPublisher.publish(message, topic);
 

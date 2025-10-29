@@ -81,9 +81,6 @@ public class ControllerKafkaListener {
             this.sagaInstanceService.updateSagaInstanceStatus(errorMessageExtracted.getNumberOfOperation(), StatusOperation.FAILED);
             this.stepLogService.updateStepLogStatus(errorMessageExtracted.getNumberOfOperation(),errorMessageExtracted.getIdStep(),StatusOperation.FAILED);
             this.workSagaService.executeCompensate(errorMessageExtracted);
-              
-
-           //flujo del servicio de errores
        }
 
       private BaseMessage convertHeaderToObjectMessage(String message) {
@@ -102,8 +99,7 @@ public class ControllerKafkaListener {
         }
     }
      private boolean isErrorMessage(String[] messageParts) {
-            // Lógica para determinar si es error
-            // Ejemplo: basado en el primer campo, longitud, etc.
+     
             return messageParts[0].equals("ERROR") || messageParts.length > 5;
         }
         

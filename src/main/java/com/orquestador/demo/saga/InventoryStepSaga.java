@@ -9,11 +9,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.orquestador.demo.controller.ControllerKafkaPublisher;
+import com.orquestador.demo.dto.JsonNodeModified;
 import com.orquestador.demo.exceptions.SagaStepCompensateException;
 import com.orquestador.demo.exceptions.SagaStepExcecutionException;
 import com.orquestador.demo.utils.ModifyPayloadJson;
+import com.orquestador.demo.utils.SagaHeaders;
 import com.orquestador.demo.utils.messages_status.HandleComponentErrors;
 @Component
 @Order(1)
@@ -25,24 +29,42 @@ public class InventoryStepSaga implements SagaStep{
       private ControllerKafkaPublisher kafkaPublisher;
       private final String stepName = "InventoryStepSaga";
       private final String topic = "inventarios";
+      private SagaHeaders sagaHeaders;
 
-  
+      public InventoryStepSaga(){
+        this.sagaHeaders = new SagaHeaders();
+ 
+      }
+    
 
-     @Override
-    public void execute(AplicationSagaContext ctx) throws SagaStepExcecutionException{
+
+    @Override
+    public void execute(AplicationSagaContext ctx) throws SagaStepExcecutionException {
         logger.info("Ejecutando InventoryStepSaga");
-        String payloadModified = ModifyPayloadJson.addCorrelationIdToObjectNode(ctx.getPayload().get("cart"), ctx.getCorrelationId());
-                                            
-         logger.info("Payload enviado a inventario: {}", payloadModified);
+        
 
-         Map<String, Object> headers = new HashMap<>();
-          
-         headers.put("component", "inventarios");
-         headers.put("correlationId", ctx.getCorrelationId());
-         headers.put("stepId",ctx.getStepId() );
-         headers.put("objetivo","grabado");
-         this.kafkaPublisher.publishWithHeaders(payloadModified, topic, headers);
+        JsonNode cartNode = ctx.getPayload().get("cart");
+        ObjectNode cartObjectNode = ModifyPayloadJson.convertJsonNodeToObjectNode(cartNode);
+        
 
+        JsonNodeModified<String> jsonModified = new JsonNodeModified<>();
+        jsonModified.setKey("correlationId");
+        jsonModified.setValue(ctx.getCorrelationId());
+        jsonModified.setObjectNode(cartObjectNode);
+        
+
+        JsonNode payloadPrepared = ModifyPayloadJson.addToJsonNode(jsonModified);
+
+        String payloadModified = payloadPrepared.toString();
+        logger.info("Payload enviado a inventario: {}", payloadModified);
+        
+        this.sagaHeaders.setComponent(stepName);
+        this.sagaHeaders.setCorrelationId(ctx.getCorrelationId());
+        this.sagaHeaders.setObjetivo("grabado");
+        this.sagaHeaders.setStepId(ctx.getStepId());
+        Map<String, Object> headers = this.sagaHeaders.toMap();
+        
+        this.kafkaPublisher.publishWithHeaders(payloadModified, topic, headers);
     }
     @Override
     public void compensate(HandleComponentErrors errorContext) throws SagaStepCompensateException{
@@ -57,13 +79,6 @@ public class InventoryStepSaga implements SagaStep{
 
     }
 
-   private String convertErrorstoString(HandleComponentErrors errorContext) {
-    try {
-        return this.mapper.writeValueAsString(errorContext);
-    } catch (Exception e) {
-        throw new RuntimeException("Error al convertir el objeto a String JSON", e);
-    }
-}
 
     @Override
     public String getStepName() {

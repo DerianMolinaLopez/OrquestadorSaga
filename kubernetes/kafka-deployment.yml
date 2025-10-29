@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka
+  template:
+    metadata:
+      labels:
+        app: kafka
+    spec:
+      containers:
+      - name: kafka
+        image: apache/kafka:3.8.1
+        ports:
+        - containerPort: 9092
+        - containerPort: 9093
+        - containerPort: 9094
+        envFrom:  # ← Esto carga TODAS las variables del ConfigMap
+        - configMapRef:
+            name: kafka-configuraciones-globales-kubernetes
+--- # Es un esparador para mostrar que se hara otra configuracion
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka
+spec:
+  selector:
+    app: kafka
+  ports:
+    - name: internal
+      protocol: TCP
+      port: 9092
+      targetPort: 9092
+    - name: external
+      protocol: TCP
+      port: 9094
+      targetPort: 9094
+    - name: controller
+      protocol: TCP
+      port: 9093
+      targetPort: 9093

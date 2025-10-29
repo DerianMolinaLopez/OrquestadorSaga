@@ -34,3 +34,5 @@ build/
 
 ## datos de kafka
 ./kafka_data
+
+./kubernetes
