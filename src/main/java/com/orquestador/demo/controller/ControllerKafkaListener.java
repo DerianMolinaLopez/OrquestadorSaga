@@ -70,6 +70,7 @@ public class ControllerKafkaListener {
     
        }
 
+
        @KafkaListener(topics = TOPIC_ERRORES, groupId = GROUP_ID_ERRORES)
        public void listenErrors(
                                 @Payload String message

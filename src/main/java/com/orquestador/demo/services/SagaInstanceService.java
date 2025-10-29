@@ -39,7 +39,8 @@ public class SagaInstanceService {
         SagaInstance sagaInstance = sagaInstanceRepository.findByCorrelationId(correlationId);
         sagaInstance.setStatus(status);
         sagaInstanceRepository.save(sagaInstance);
-    }
+    }//ordenes
+    // COMPLETADO_ordenes_1_confirmaciones_a20d3e93-aad9-41dc-9612-b7923178b438
 
     public void updateCurrentStepSagaInstance(String correlationId, String currentStep){ 
         SagaInstance sagaInstance = sagaInstanceRepository.findByCorrelationId(correlationId);
