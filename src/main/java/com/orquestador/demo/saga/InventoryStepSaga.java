@@ -66,6 +66,8 @@ public class InventoryStepSaga implements SagaStep{
         
         this.kafkaPublisher.publishWithHeaders(payloadModified, topic, headers);
     }
+
+
     @Override
     public void compensate(HandleComponentErrors errorContext) throws SagaStepCompensateException{
         logger.info("Compensando InventoryStepSaga");

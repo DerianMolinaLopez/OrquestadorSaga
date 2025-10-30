@@ -189,6 +189,32 @@ services:
     networks:
       - microservicios-proceso-comrpas_app_network
       - app_network  
+  
+  ordenes:
+    image: ordenes:0.0.1
+    mem_limit: 512m         
+    cpus: 0.5               
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      # IMPORTANTE: usar DNS del servicio mysql y el puerto interno 3306
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql_ordenes:3306/ordenes?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: derian
+      SPRING_DATASOURCE_PASSWORD: derian
+      SERVER_PORT: 8080
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      
+    ports:
+      - "8087:8080"
+    restart: unless-stopped
+    depends_on:
+      mysql-ordenes:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+      
+    networks:
+      - microservicios-proceso-comrpas_app_network
+      - app_network
 
 
 

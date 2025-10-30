@@ -1,0 +1,147 @@
+{
+	"correlationId": "8d4e7a2c-1f9a-4b8c-a3b5-c8e9d0f1a2b3",
+	"idempotencyKey": "order-cust_2045-2025-09-03T14:30:00.000Z",
+	"clientID": "CLIENTE_2045",
+	"channel": "app",
+	"tenant": "mx",
+	"sagaVersion": "1.0",
+	"customer": {
+		"id": "cust_2045",
+		"email": "juan.perez@empresa.com",
+		"phone": "+52-55-1234-5678",
+		"name": "Juan Pérez García",
+		"loyalty": {
+			"cardId": "LOY-7723",
+			"accrue": true
+		}
+	},
+	"cart": {
+		"currency": "MXN",
+		"coupon": {
+			"code": "TECH15",
+			"discountValue": 0.15,
+			"type": "percentage"
+		},
+		"items": [
+			{
+				"lineId": "LINE-001",
+				"sku": "SKU-0001",
+				"name": "Laptop HP Pavilion 15",
+				"qty": 1,
+				"unitPrice": 14000.00,
+				"taxRate": 0.16,
+				"warehouse": "CEDIS-CULIACAN",
+				"vendor": "main",
+				"attributes": {
+					"color": "Gris",
+					"garantia": "1 año",
+					"procesador": "Intel i5"
+				},
+				"weightKg": 2.1,
+				"dimensionsCm": {
+					"l": 36,
+					"w": 24,
+					"h": 2
+				},
+				"requiresSerial": true
+			},
+			{
+				"lineId": "LINE-009",
+				"sku": "SKU-0009",
+				"name": "Tarjeta GeForce ASUS RTX 3060 12GB",
+				"qty": 1,
+				"unitPrice": 8900.00,
+				"taxRate": 0.16,
+				"warehouse": "CEDIS-CULIACAN",
+				"vendor": "main",
+				"attributes": {
+					"memoria": "12GB GDDR6",
+					"conectores": "HDMI, DisplayPort"
+				},
+				"weightKg": 1.2,
+				"dimensionsCm": {
+					"l": 30,
+					"w": 12,
+					"h": 5
+				},
+				"requiresSerial": true
+			}
+		],
+		"totals": {
+			"subtotal": 22900.00,
+			"discounts": 3435.00,
+			"tax": 3114.40,
+			"shipping": 150.00,
+			"grandTotal": 21729.40
+		}
+	},
+	"payment": {
+		"amount": 21729.40,
+		"currency": "MXN",
+		"method": "card",
+		"token": "tok_master_5555",
+		"capture": true,
+		"installments": {
+			"count": 6,
+			"issuer": "mastercard"
+		},
+		"billingAddressId": "bill_22",
+		"fraud": {
+			"deviceId": "dev-9bg2",
+			"ip": "201.150.100.50",
+			"fingerprint": "a7e1g2h5…",
+			"riskScore": 0.1
+		},
+		"split": [
+			{
+				"payee": "main",
+				"amount": 21729.40
+			}
+		]
+	},
+	"shipping": {
+		"method": "home-delivery",
+		"carrier": "dhl",
+		"serviceLevel": "express",
+		"addressId": "addr_45",
+		"addressOverride": {
+			"street": "Blvd. Las Torres 456",
+			"extNo": "789",
+			"intNo": "Piso 3",
+			"neighborhood": "Zona Rio",
+			"city": "Tijuana",
+			"state": "BCN",
+			"postalCode": "22010",
+			"country": "MX",
+			"geo": {
+				"lat": 32.525,
+				"lng": -117.038
+			}
+		},
+		"slot": {
+			"date": "2025-09-04",
+			"window": "09:00-13:00"
+		},
+		"contact": {
+			"name": "Juan Pérez García",
+			"phone": "+52-55-1234-5678"
+		},
+		"notes": "Oficinas - Recepción 3er piso",
+		"requiresSignature": true
+	},
+	"invoice": {
+		"required": true,
+		"rfc": "PEJU800101HZ0",
+		"usoCFDI": "G03",
+		"emailCFDI": "contabilidad@empresa.com",
+		"receptor": {
+			"nombre": "Juan Pérez García",
+			"regimenFiscalReceptor": "612",
+			"domicilioFiscalReceptor": "22010"
+		}
+	},
+	"notifications": {
+		"channels": ["email", "push"],
+		"language": "es-MX"
+	}
+}

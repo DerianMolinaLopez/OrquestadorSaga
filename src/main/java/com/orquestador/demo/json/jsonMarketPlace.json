@@ -1,0 +1,122 @@
+{
+	"correlationId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+	"idempotencyKey": "order-cust_3078-2025-09-03T16:45:00.000Z",
+	"clientID": "CLIENTE_3078",
+	"channel": "web",
+	"tenant": "mx",
+	"sagaVersion": "1.0",
+	"customer": {
+		"id": "cust_3078",
+		"email": "ana.garcia@outlook.com",
+		"phone": "+52-33-9876-5432",
+		"name": "Ana García Rodríguez",
+		"loyalty": {
+			"cardId": "LOY-4456",
+			"accrue": true
+		}
+	},
+	"cart": {
+		"currency": "MXN",
+		"coupon": null,
+		"items": [
+			{
+				"lineId": "LINE-002",
+				"sku": "SKU-0002",
+				"name": "Monitor Samsung 24\" PRO",
+				"qty": 2,
+				"unitPrice": 3200.00,
+				"taxRate": 0.16,
+				"warehouse": "CEDIS-CULIACAN",
+				"vendor": "main",
+				"attributes": {
+					"resolution": "1920x1080",
+					"panel": "IPS"
+				},
+				"weightKg": 4.5,
+				"dimensionsCm": {
+					"l": 55,
+					"w": 35,
+					"h": 15
+				},
+				"requiresSerial": true
+			},
+			{
+				"lineId": "LINE-004",
+				"sku": "SKU-0004",
+				"name": "Teclado Mecánico Redragon 6552",
+				"qty": 1,
+				"unitPrice": 950.00,
+				"taxRate": 0.16,
+				"warehouse": "CEDIS-MAZATLAN",
+				"vendor": "marketplace-15",
+				"attributes": {
+					"tipo": "Mecánico",
+					"switches": "Outemu Blue"
+				},
+				"weightKg": 1.1,
+				"dimensionsCm": {
+					"l": 44,
+					"w": 15,
+					"h": 3
+				},
+				"requiresSerial": false
+			},
+			{
+				"lineId": "LINE-007",
+				"sku": "SKU-0007",
+				"name": "Memoria RAM Corsair Vengeance 16GB DDR4",
+				"qty": 2,
+				"unitPrice": 950.00,
+				"taxRate": 0.16,
+				"warehouse": "CEDIS-HERMOSILLO",
+				"vendor": "main",
+				"attributes": {
+					"frecuencia": "3200MHz",
+					"latencia": "CL16"
+				},
+				"weightKg": 0.08,
+				"dimensionsCm": {
+					"l": 13,
+					"w": 3,
+					"h": 1
+				},
+				"requiresSerial": false
+			}
+		],
+		"totals": {
+			"subtotal": 9250.00,
+			"discounts": 0.00,
+			"tax": 1480.00,
+			"shipping": 200.00,
+			"grandTotal": 10930.00
+		}
+	},
+	"payment": {
+		"amount": 10930.00,
+		"currency": "MXN",
+		"method": "card",
+		"token": "tok_amex_3782",
+		"capture": true,
+		"installments": {
+			"count": 1,
+			"issuer": "amex"
+		},
+		"billingAddressId": "bill_33",
+		"fraud": {
+			"deviceId": "dev-c4d5",
+			"ip": "200.50.150.75",
+			"fingerprint": "b8f9g0h1…",
+			"riskScore": 0.05
+		},
+		"split": [
+			{
+				"payee": "main",
+				"amount": 9880.00
+			},
+			{
+				"payee": "marketplace-15",
+				"amount": 1050.00
+			}
+		]
+	}
+}

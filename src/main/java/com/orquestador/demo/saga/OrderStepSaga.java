@@ -1,5 +1,6 @@
 package com.orquestador.demo.saga;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -52,25 +53,29 @@ public class OrderStepSaga implements  SagaStep{
         JsonNode payloadPrepared = ModifyPayloadJson.addToJsonNode(jsonModified);
 
         String payloadModified = payloadPrepared.toString();
-        logger.info("Payload enviado a inventario: {}", payloadModified);
+        logger.info("Payload enviado a ordenes: {}", payloadModified);
         
         this.sagaHeaders.setComponent(stepName);
+        logger.info("Numero de la operacion:{}",ctx.getCorrelationId());
         this.sagaHeaders.setCorrelationId(ctx.getCorrelationId());
         this.sagaHeaders.setObjetivo("grabado");
         this.sagaHeaders.setStepId(ctx.getStepId());
         Map<String, Object> headers = this.sagaHeaders.toMap();
-        System.out.println("identificando los headers en orders");
-        System.out.println(headers.toString());
+
         
         this.kafkaPublisher.publishWithHeaders(payloadModified, topic, headers);
     }
+  
+    
     @Override
     public void compensate(HandleComponentErrors errorContext) throws SagaStepCompensateException{
-        logger.info("Compensando OrderStepSaga");
-
-  //      this.kafkaPublisher.publishWithHeaders(stepName, topic, headers);
-      //  String message = this.convertErrorstoString(errorContext);
-      //  this.kafkaPublisher.publish(message, topic);
+         logger.info("Compensando OrderStepSaga");
+  
+        Map<String,Object> headers = new HashMap<>();
+         headers.put("component", "ordenes");
+         headers.put("correlationId", errorContext.getNumberOfOperation());
+         headers.put("objetivo","compensacion");
+        this.kafkaPublisher.publishWithHeaders(errorContext.getErrorMessage(), topic, headers);
 
     }
 
